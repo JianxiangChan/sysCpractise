@@ -59,27 +59,26 @@ int delete_node(struct node *pH, int data)
 	struct node *pPREV = NULL;	//用来指向当前节点的前一个节点
 	while(NULL != p->pNext)		//遍历，走到尾节点处推出循环
 	{
-		prev = p;
-		p = p->pNext;
-		if(p->)
+		//prev = p;
+		//p = p->pNext;
+		//if(p->)
 	}
 }
 
 
+
 int main (void)
-{	
+{
 	struct node *pHeader =creat_node(0);
+	insert_head(pHeader,creat_node(4));
 	insert_tail(pHeader,creat_node(1));
 	insert_tail(pHeader,creat_node(2));
 	insert_tail(pHeader,creat_node(3));
-	insert_head(pHeader,creat_node(4));
-	//printf("node1 data: %d.\n",pHeader->data);
-	
+	list_for_each(pHeader);
 	printf("node1 data: %d.\n",pHeader->pNext->data);
 	printf("node2 data: %d.\n",pHeader->pNext->pNext->data);
 	printf("node3 data: %d.\n",pHeader->pNext->pNext->pNext->data);
 	printf("node4 data: %d.\n",pHeader->pNext->pNext->pNext->pNext->data);
-	list_for_each(pHeader);
 	return 0;
 }
 
