@@ -34,13 +34,36 @@ void insert_tail(struct node *pH,struct node *new)
 	p->pNext = new;
 } 
 
+void insert_head(struct node *pH, struct node *new)
+{
+	new->pNext = pH->pNext;
+	pH->pNext = new;
+}
+
+void list_for_each(struct node *pH)
+{
+	struct node *p = pH;
+	printf("-----------begin-----------\n");
+	while (NULL != p->pNext)
+	{
+		p = p->pNext;
+		printf("node data: %d.\n",p->data);
+	}
+	printf("----------end--------------\n");
+	
+}
+
 int main (void)
 {
-	struct node *pHeader =creat_node(1);
+	struct node *pHeader =creat_node(0);
+	insert_head(pHeader,creat_node(4));
+	insert_tail(pHeader,creat_node(1));
 	insert_tail(pHeader,creat_node(2));
 	insert_tail(pHeader,creat_node(3));
-	printf("node1 data: %d.\n",pHeader->data);
+	list_for_each(pHeader);
 	printf("node2 data: %d.\n",pHeader->pNext->data);
 	printf("node3 data: %d.\n",pHeader->pNext->pNext->data);
+	printf("node3 data: %d.\n",pHeader->pNext->pNext->pNext->data);
+	printf("node2 data: %d.\n",pHeader->pNext->pNext->pNext->pNext->data);
 	return 0;
 }
