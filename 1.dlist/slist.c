@@ -3,30 +3,30 @@
 #include "stdlib.h"
 #include "string.h" 
 //定义一个链表结构体
-struct node 
+struct Node 	//结构体、枚举和联合名 首字母大写，多个单词下划线分隔
 {
 	int data;
-	struct node *pNext;
+	struct Node *pNext;
 };
 
 //创建一个节点并且初始化
-struct node * creat_node(int data)
+struct Node * creat_node(int data)
 {
-	struct node *p =(struct node *)malloc(sizeof(struct node));
+	struct Node *p =(struct Node *)malloc(sizeof(struct Node));
 	if(NULL == p)
 	{
 		printf("malloc error.\n");
 	}
-	bzero(p,sizeof(struct node));
+	bzero(p,sizeof(struct Node));
 	p->data =data;
 	p->pNext = NULL; 
 	return p;
 }
 
-void insert_tail(struct node *pH,struct node *new)
+void insert_tail(struct Node *pH,struct Node *new)
 {
 	//查找最后一个指针
-	struct node *p = pH;
+	struct Node *p = pH;
 	while (NULL != p->pNext)
 	{
 		p = p->pNext;
@@ -35,18 +35,18 @@ void insert_tail(struct node *pH,struct node *new)
 	p->pNext = new;
 } 
 
-void insert_head_middle(struct node *pH,struct node *new)
+void insert_head_middle(struct Node *pH,struct Node *new)
 {
 	new->pNext = pH->pNext;
 	pH->pNext = new;
 }
 //在链表中间第index节点后插入一个节点
 //index 大于等于 0
-char insert_all(struct node *pH,struct node *new,int index)
+char insert_all(struct Node *pH,struct Node *new,int index)
 {
-	struct node *p = pH;
+	struct Node *p = pH;
 	//用于存储index节点后面一个节点的地址
-	struct node *pBack;
+	struct Node *pBack;
 	if(0 > index)
 	{
 		printf("error:illegal input of index\n");
@@ -89,10 +89,10 @@ char insert_all(struct node *pH,struct node *new,int index)
 }
 
 
-int delete_node(struct node *pH, int data)
+int delete_Node(struct Node *pH, int data)
 {
-	struct node *p =pH;				//用来指向当前节点
-	struct node *pPrev = NULL;		//用来指向当前节点的前一个节点
+	struct Node *p =pH;				//用来指向当前节点
+	struct Node *pPrev = NULL;		//用来指向当前节点的前一个节点
 	while(NULL != p->pNext)			//遍历，走到尾节点处推出循环
 	{
 		pPrev = p;					//跟随p移动，指向p的前一个节点
@@ -116,22 +116,22 @@ int delete_node(struct node *pH, int data)
 	return -1;
 }
 
-void list_for_each(struct node* pH)
+void list_for_each(struct Node* pH)
 {
-	struct node *p =pH;
+	struct Node *p =pH;
 	printf("--------------begin-------------\n");
 	while(NULL != p->pNext)
 	{
 		p = p->pNext;
-		printf("node data: %d.\n",p->data);
+		printf("Node data: %d.\n",p->data);
 	}
 	printf("--------------end-------------\n");
 }
 
-void reverse_list(struct node *pH)
+void reverse_list(struct Node *pH)
 {
-	struct node *p =pH->pNext; 			//p指向第一个有效节点
-	struct node *pBack;					//保存当前节点的后一个节点地址
+	struct Node *p =pH->pNext; 			//p指向第一个有效节点
+	struct Node *pBack;					//保存当前节点的后一个节点地址
 	//当链表没有有效节点的话或者只有一个有效节点，逆序不用做任何操作
 	if( (NULL ==p) || (NULL == p->pNext) )
 	return;
@@ -156,22 +156,22 @@ void reverse_list(struct node *pH)
 
 int main (void)
 {
-	struct node *pHeader =creat_node(0);
+	struct Node *pHeader =creat_node(0);
  	insert_head_middle(pHeader,creat_node(4));
 	insert_tail(pHeader,creat_node(1));
 	insert_tail(pHeader,creat_node(2));
 	insert_tail(pHeader,creat_node(3)); 
 	list_for_each(pHeader);
-	delete_node(pHeader,4);
+	delete_Node(pHeader,4);
 	list_for_each(pHeader);
 	reverse_list(pHeader);
 	list_for_each(pHeader);
 	insert_all(pHeader,creat_node(5),0);
 	list_for_each(pHeader);
-	/* printf("node1 data: %d.\n",pHeader->pNext->data);
-	printf("node2 data: %d.\n",pHeader->pNext->pNext->data);
-	printf("node3 data: %d.\n",pHeader->pNext->pNext->pNext->data);
-	printf("node4 data: %d.\n",pHeader->pNext->pNext->pNext->pNext->data); */
+	/* printf("Node1 data: %d.\n",pHeader->pNext->data);
+	printf("Node2 data: %d.\n",pHeader->pNext->pNext->data);
+	printf("Node3 data: %d.\n",pHeader->pNext->pNext->pNext->data);
+	printf("Node4 data: %d.\n",pHeader->pNext->pNext->pNext->pNext->data); */
 	return 0;
 }
 
