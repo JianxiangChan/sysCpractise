@@ -1,7 +1,8 @@
-#include "stdio.h"
-#include "malloc.h"
-#include "stdlib.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "dlist.h"
 //将功能类似的代码（如宏定义、类型定义、函数声明、和全局变量）放在一起，和其他的部分使用空行分隔
 #define MAX_PATH 260					//宏定义：单词大写，多个单词下划线分隔
 
@@ -10,20 +11,20 @@
 //C语言双链表的实现
 //构建一个双链表节点类型
 //结构体/枚举/联合名声明使用空行分隔（这里是声明之间空行，还是内部成员之间空行？）
-struct Node								//结构体/枚举/联合名 首字母大写							
+struct _Node								//结构体/枚举/联合名 首字母大写							
 {										//多个单词连写
 		int data;
-		struct Node *pPrev;
-		struct Node *pNext;
+		Node *pPrev;
+		Node *pNext;
 };
 
 //创建一个双向链表
-struct Node *node_create (int data)		//函数名小写，多个单词用下划线分隔
+Node *node_create (int data)		//函数名小写，多个单词用下划线分隔
 {										//面对对象的命名方式：采用主语+谓语的形式来命名
 										//取代传统的 谓语+宾语方式
 										//对象都有自己的生命周期，所以需要创建对于的销毁函数
 
-	struct Node *p = (struct Node *)malloc(sizeof(struct Node));
+	struct _Node *p = (Node *)malloc(sizeof(Node));
 	if(NULL == p)
 	{
 		printf("malloc error.\n");
@@ -36,10 +37,10 @@ struct Node *node_create (int data)		//函数名小写，多个单词用下划�
 }
 //函数体之间使用空格
 //双向链表尾部插入
-void node_insert_tail (struct Node *thiz, struct Node *new) //第一个参数为对象，并用thiz命名
+static void node_insert_tail (Node *thiz, Node *new) //第一个参数为对象，并用thiz命名
 {
 	//第一步：找到链表的尾节点
-	struct Node *p = thiz;
+	Node *p = thiz;
 	while (NULL != p->pNext)
 	{
 		p -> pNext;
@@ -51,7 +52,7 @@ void node_insert_tail (struct Node *thiz, struct Node *new) //第一个参数为
 }
 
 //双向链表头部插入
-void note_insert_head_middle(struct Node *thiz, struct Node *new)
+static void note_insert_head_middle(Node *thiz, Node *new)
 {
 	new->pNext = thiz->pNext;								//新节点的next指针指向原来的节点1的地址
 	//只有表头节点不能让第一个节点指向新节点，这样会导致内存错误
@@ -75,10 +76,10 @@ void insert_middle(struct node *thiz, struct node *new)
 
 //插入双向链表中的任意一个节点
 //合理使用空格 参数之间用空格 
-char note_insert_all(struct Node *thiz, struct Node *new, int index)
+char note_insert_all(Node *thiz, Node *new, int index)
 {
 	//等号之间用空格
-	struct Node *p = thiz;
+	Node *p = thiz;
 	if(0 > index)
 	{	
 					//语句末的分号和前面内容不要加空格
@@ -87,8 +88,7 @@ char note_insert_all(struct Node *thiz, struct Node *new, int index)
 	}
 	
 	//第一步，找到index节点
-	//if(0 != index)
-	//{
+	
 		//用括号分隔表达式，不要靠默认优先级来判断
 		while((index --) && (NULL != p->pNext))
 		{
@@ -107,21 +107,17 @@ char note_insert_all(struct Node *thiz, struct Node *new, int index)
 		}
 		else
 		{
-			node_insert_tail(p, new);
+			node_insert_tail(p,new);
 		}
-	//}
-/* 	else
-	{
-		insert_head(p, new);
-	} */
+
 	return 1;
 }
 
 //正向遍历
-struct Node * note_list_all(struct Node *thiz)
+static Node * note_list_all(Node *thiz)
 {
 	
-	struct Node *p = thiz;
+	Node *p = thiz;
 	if(NULL == p)
 	{
 		return NULL;
@@ -130,28 +126,68 @@ struct Node * note_list_all(struct Node *thiz)
 	while(NULL != p->pNext)
 	{
 		p = p->pNext;
-		printf("Node data: %d.\n", p->data);
+		printf("_Node data: %d.\n", p->data);
 	}
 	printf("--------------end-------------\n");
 	return p;
 }
 
 //逆向遍历
-void note_list_all_reverse(struct Node *pTail)
+static void note_list_all_reverse(Node *pTail)
 {
-	struct Node *p = pTail;
+	Node *p = pTail;
 	printf("--------------begin-------------\n");
 	while( NULL != p->pPrev)
 	{
-		printf("Node data: %d.\n", p->data);
+		printf("_Node data: %d.\n", p->data);
 		p = p->pPrev;
 	}
 	printf("--------------end-------------\n");
 }
 
-char note_delete(struct Node *thiz, int data)
+char note_list(Node *thiz, int index)
 {
-	struct Node *p = thiz;
+	Node *p = thiz;
+	if(-1 > index)
+	{
+		printf("error: illegal input");
+		return -1;
+	}
+	switch (index){
+	case -1:
+		while(NULL != p->pNext)
+		{
+			p = p->pNext;
+			//printf("_Node data: %d.\n", p->data);
+		}
+		note_list_all_reverse(p);
+		break;
+	case 0:
+		note_list_all(p);
+		break;
+	default:
+		while((index--) && (0 != (p->pNext)))
+		{
+			p = p->pNext;
+		}
+		if(0 != (index+1))
+		{
+			printf("error: index is beyond the MAX size of the list\n");
+			return -1;
+		}
+		else
+		{
+			printf("node data of the index is %d.\n",p->data);
+		}
+	
+	}
+	return 0;
+	
+}
+
+char note_delete(Node *thiz, int data)
+{
+	Node *p = thiz;
 	if(NULL == p)
 	return -1;
 
@@ -177,22 +213,4 @@ char note_delete(struct Node *thiz, int data)
 	return -1;
 }
 
-int main (void)
-{
-	struct Node *pHeader = node_create(0);
-	note_insert_all(pHeader, node_create(1), 0);
-	note_insert_all(pHeader, node_create(2), 1);
-	note_insert_all(pHeader, node_create(3), 2);
-	note_insert_all(pHeader, node_create(4), 3);
-	note_insert_all(pHeader, node_create(5), 2); 
-	note_insert_all(pHeader, node_create(6), 0);
 
-	printf("正向遍历： \n");
-	struct Node *pTail = note_list_all(pHeader);
-	printf("逆向遍历： \n");
-	note_list_all_reverse(pTail);
-	note_delete(pHeader, 1);
-	printf("正向遍历： \n");
-	note_list_all(pHeader);
-	return 0;
-}
