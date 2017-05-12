@@ -35,23 +35,59 @@ void insert_tail(struct node *pH,struct node *new)
 	p->pNext = new;
 } 
 
-void insert_head(struct node *pH,struct node *new)
+void insert_head_middle(struct node *pH,struct node *new)
 {
 	new->pNext = pH->pNext;
 	pH->pNext = new;
 }
-
-void list_for_each(struct node* pH)
+//在链表中间第index节点后插入一个节点
+//index 大于等于 0
+char insert_all(struct node *pH,struct node *new,int index)
 {
-	struct node *p =pH;
-	printf("--------------begin-------------\n");
-	while(NULL != p->pNext)
+	struct node *p = pH;
+	//用于存储index节点后面一个节点的地址
+	struct node *pBack;
+	if(0 > index)
 	{
-		p = p->pNext;
-		printf("node data: %d.\n",p->data);
+		printf("error:illegal input of index\n");
+		return 0;
 	}
-	printf("--------------end-------------\n");
+	//第一步，找到index节点
+	if(0 != index)
+	{
+		while( (index --)&&(NULL != p->pNext) )
+		{
+			p=p->pNext;
+		}
+		pBack = p->pNext;
+		if( (NULL == p->pNext)&&( 0 != (index+1) ) )
+		{
+			printf("error:index beyond the MAX size of the list.\n");
+			return 0;
+		}
+		else if((NULL != p->pNext)&&( 0 == (index+1) ))
+		{
+/* 			//printf("i am here1\n");
+			pBack = p->pNext;
+			//index节点指向新节点
+			p->pNext = new;
+			//新节点指向index+1
+			new->pNext = pBack; */
+			insert_head_middle(p,new);
+		}
+		else
+		{
+			insert_tail(p,new);
+		}
+	}
+/* 	else
+	{
+		insert_head(p,new);
+	} */
+	return 1;
+	
 }
+
 
 int delete_node(struct node *pH, int data)
 {
@@ -80,6 +116,18 @@ int delete_node(struct node *pH, int data)
 	return -1;
 }
 
+void list_for_each(struct node* pH)
+{
+	struct node *p =pH;
+	printf("--------------begin-------------\n");
+	while(NULL != p->pNext)
+	{
+		p = p->pNext;
+		printf("node data: %d.\n",p->data);
+	}
+	printf("--------------end-------------\n");
+}
+
 void reverse_list(struct node *pH)
 {
 	struct node *p =pH->pNext; 			//p指向第一个有效节点
@@ -102,21 +150,23 @@ void reverse_list(struct node *pH)
 		p = pBack;
 	
 	}
-	insert_head(pH,p);
+	insert_head_middle(pH,p);
 	//return p;
 }
 
 int main (void)
 {
 	struct node *pHeader =creat_node(0);
-	insert_head(pHeader,creat_node(4));
+ 	insert_head_middle(pHeader,creat_node(4));
 	insert_tail(pHeader,creat_node(1));
 	insert_tail(pHeader,creat_node(2));
-	insert_tail(pHeader,creat_node(3));
+	insert_tail(pHeader,creat_node(3)); 
 	list_for_each(pHeader);
 	delete_node(pHeader,4);
 	list_for_each(pHeader);
 	reverse_list(pHeader);
+	list_for_each(pHeader);
+	insert_all(pHeader,creat_node(5),0);
 	list_for_each(pHeader);
 	/* printf("node1 data: %d.\n",pHeader->pNext->data);
 	printf("node2 data: %d.\n",pHeader->pNext->pNext->data);
