@@ -1,40 +1,116 @@
+/********************************
+*Program Assignmert: 		实现通用双向链表
+*Author:							JianxiangChan
+*Date:								2017/5/13
+*Description:					
+*********************************/
+/*********************************
+*Source code in:
+					sysCpractise\1.dlist\1.3universal
+*Function List:	
+*						dlist_create	实现一个Dlist的初始化
+*						
+*
+**********************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "dlist.h"
-//将功能类似的代码（如宏定义、类型定义、函数声明、和全局变量）放在一起，和其他的部分使用空行分隔
-#define MAX_PATH 260					//宏定义：单词大写，多个单词下划线分隔
 
-//空行分隔一行就够了，不然显得空空荡荡的
-
-//C语言双链表的实现
-//构建一个双链表节点类型
-//结构体/枚举/联合名声明使用空行分隔（这里是声明之间空行，还是内部成员之间空行？）
-struct _Node								//结构体/枚举/联合名 首字母大写							
-{										//多个单词连写
-		int data;
+#define return_val_if_fail(p, val) /
+    if(!(p)) {printf("%s:%d"#p" failed./n", __func__, __LINE__); return val;}
+	
+//建立通用链表的存储结构
+typedef struct _DListNode
+{									
+		void * data;
 		Node *pPrev;
 		Node *pNext;
-};
+}DListNode;
 
-//创建一个双向链表
-Node *node_create (int data)		//函数名小写，多个单词用下划线分隔
-{										//面对对象的命名方式：采用主语+谓语的形式来命名
-										//取代传统的 谓语+宾语方式
-										//对象都有自己的生命周期，所以需要创建对于的销毁函数
+typedef struct _DList
+{
+	DListNode *head;
+	DListNode *current;
+}DList;
 
-	struct _Node *p = (Node *)malloc(sizeof(Node));
-	if(NULL == p)
+//定义一个enum来存放函数的返回值，可以不定义
+typedef enum _Ret
+{
+	RET_OK = 1,
+	RET_FAULT,
+	RET_OOM,
+}Ret;
+
+/**********************************
+*Function Name:	dlist_create
+*Purpose:				实现DList结构体的初始化
+*Params:				空
+*Return:				DList返回初始化的地址
+*Limitation			返回NULL就说明初始化失败
+**********************************/
+DList *dlist_create ()
+{
+	DList *dlist = (DList *)calloc(1, sizeof(DList));
+	if(NULL == DList)
 	{
-		printf("malloc error.\n");
 		return NULL;
 	}
-	p->data  = data;
-	p->pPrev = NULL;
-	p->pNext = NULL;
-	return p;
+	
+	dlist->head  = (DListNode *)calloc(1,sizeof(DListNode));
+	if(NULL == dlist->head)
+	{
+		free(dlist);
+		dlist = NULL;
+		return NULL;
+	}
+	dlist->current = dlist->head;
+	return dlist;
 }
+
+/**********************************
+*Function Name:	data_dlist_check
+*Purpose:				检查输入指针地址是否为空
+*Params:				
+*							@DList *  thiz	 添加节点的对象
+							@void * 	data   添加的数据地址
+*Return:				DList返回初始化的地址
+*Limitation			返回1：说明地址不为空，返回0说明为空。
+**********************************/
+int data_dlist_check(DList *thiz, void  *data)
+{
+	if((NULL == dlist) || (NULL == thiz))
+	{
+		return 0;
+	}
+	return 1;
+}
+
+/**********************************
+*Function Name:	dlist_add
+*Purpose:				给双向链表添加节点和数据
+*Params:				
+*							@DList *  thiz	 添加节点的对象
+							@int			index 添加节点的位置
+							@void * 	data   添加的数据地址
+*Return:				Ret
+*Limitation			返回RET_OK RET_FAULT RET_OOM
+**********************************/
+Ret dlist_add(DList *thiz, int index, void *data)
+{
+	int flag = 1;
+	int len = 0;
+	DListNode *node =NULL;
+	DListNode *dlistnode = NULL;
+	
+	return_val_if_fail((NULL != dlist) && (NULL != data), RET_FAULT);
+	 
+	if(data_dlist_check(dlist, data))
+	{
+		
+	}
+} 
+/*
 //函数体之间使用空格
 //双向链表尾部插入
 static void node_insert_tail (Node *thiz, Node *new) //第一个参数为对象，并用thiz命名
@@ -63,7 +139,7 @@ static void note_insert_head_middle(Node *thiz, Node *new)
 	
 }
 
-/* //双向链表中间插入
+ //双向链表中间插入
 void insert_middle(struct node *thiz, struct node *new)
 {
 	struct node *p  = thiz;
@@ -72,7 +148,7 @@ void insert_middle(struct node *thiz, struct node *new)
 	new->pPrev = p;
 	new->pNext = temp;
 	temp->pPrev = new;
-} */
+} 
 
 //插入双向链表中的任意一个节点
 //合理使用空格 参数之间用空格 
@@ -212,5 +288,5 @@ char note_delete(Node *thiz, int data)
 	printf("未找到要删除的节点.\n");
 	return -1;
 }
-
+*/
 
