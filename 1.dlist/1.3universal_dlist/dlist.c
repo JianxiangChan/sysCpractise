@@ -79,11 +79,33 @@ DList *dlist_create ()
 **********************************/
 int data_dlist_check(DList *thiz, void  *data)
 {
-	if((NULL == dlist) || (NULL == thiz))
+	if((NULL == data) || (NULL == thiz))
 	{
 		return 0;
 	}
 	return 1;
+}
+
+/**********************************
+*Function Name:	dlist_len
+*Purpose:				查看链表的长度
+*Params:				
+*							@DList *  thiz	 插座链表的对象
+*Return:				int 返回链表的长度值
+*Limitation			
+**********************************/
+int dlist_len(DList *thiz)
+{
+	return_val_if_fail(thiz != NULL,RET_FAULT);
+	int len = 0;
+	DListNode *dlistnode = NULL;
+	dlistnode = thiz->head;
+	while(dlistnode->head != NULL)
+	{
+		dlistnode = dlistnode->next;
+		len = len + 1;
+	}
+	return len;
 }
 
 /**********************************
@@ -103,12 +125,75 @@ Ret dlist_add(DList *thiz, int index, void *data)
 	DListNode *node =NULL;
 	DListNode *dlistnode = NULL;
 	
-	return_val_if_fail((NULL != dlist) && (NULL != data), RET_FAULT);
-	 
-	if(data_dlist_check(dlist, data))
+	//数据检查
+	return_val_if_fail((NULL != thiz) && (NULL != data), RET_FAULT); 
+	if(! (data_dlist_check(thiz, data)))
 	{
-		
+		return RET_FAULT;
 	}
+	
+	node = (DListNode *)calloc(1, sizeof(DListNode));
+	if(node == NULL)
+	{
+		return RET_OOM;
+	}
+	node->data = data;
+	
+	dlistnode = thiz;
+	//找到index节点位置,或者找到链表尾部
+	while((0 < index)&&(NULL != dlistnode->pNext) )
+	{
+		dlistnode = dlistnode->pNext;
+		index--;
+	}
+	
+	if((NULL == dlistnode->pNext) && (0 <  index))
+	{
+		//说明index已经跑到链表最大长度外面了
+		printf("error:index beyond the MAX size of the list.\n");
+		return RET_OOM;
+	}
+	else if((NULL != dlistnode->pNext) && (0 == index))
+	{
+		//中间节点
+		node->pNext = dlistnode->pNext;
+		node->pPrev = dlistnode;
+		dlistnode->pNext->pPrev = node;
+		dlistnode->pNext = node;
+	}
+	else 
+	{
+		//尾部节点
+		thiz->current->pNext = node;
+		node->pPrev = thiz->current;
+		thiz->current = node;
+	}
+	
+	
+	
+	
+	//尾部
+	if(((len == 0) && (index == 0)) || index < 0)
+	{
+		dlist->current->next = node;
+		node->prev = dlist->current;
+		dlist->current = node;
+		
+		return RET_OK;
+	}
+	else if((len != 0) && (index == 0))
+	{
+		dlist->head->next->prev = node;
+		node->prev = dlist->head;
+		node->next = dlist->head->next;
+		dlist->head->next = node;
+	}
+	else if((len != 0) && (index != 0))
+	{
+		dlistnode = dlist_get
+	}
+	
+	
 } 
 /*
 //函数体之间使用空格
