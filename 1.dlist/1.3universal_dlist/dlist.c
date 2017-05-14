@@ -120,8 +120,6 @@ int dlist_len(DList *thiz)
 **********************************/
 Ret dlist_add(DList *thiz, int index, void *data)
 {
-	int flag = 1;
-	int len = 0;
 	DListNode *node =NULL;
 	DListNode *dlistnode = NULL;
 	
@@ -160,41 +158,66 @@ Ret dlist_add(DList *thiz, int index, void *data)
 		node->pPrev = dlistnode;
 		dlistnode->pNext->pPrev = node;
 		dlistnode->pNext = node;
+		return RET_OK
 	}
 	else 
 	{
-		//尾部节点
+		//尾部节点(只有头节点没有其他节点，也放在尾部节点里面)
 		thiz->current->pNext = node;
 		node->pPrev = thiz->current;
 		thiz->current = node;
+		return RET_OK
 	}
-	
-	
-	
-	
-	//尾部
-	if(((len == 0) && (index == 0)) || index < 0)
-	{
-		dlist->current->next = node;
-		node->prev = dlist->current;
-		dlist->current = node;
-		
-		return RET_OK;
-	}
-	else if((len != 0) && (index == 0))
-	{
-		dlist->head->next->prev = node;
-		node->prev = dlist->head;
-		node->next = dlist->head->next;
-		dlist->head->next = node;
-	}
-	else if((len != 0) && (index != 0))
-	{
-		dlistnode = dlist_get
-	}
-	
-	
+	return RET_FAULT
 } 
+
+Ret dlist_delete(DList *thiz, int index)
+{
+	DListNode *dlistnode = NULL;
+	
+	//数据检查
+	return_val_if_fail(NULL != thiz, RET_FAULT); 
+	if(! (data_dlist_check(thiz, 1)))
+	{
+		return RET_FAULT;
+	}
+	
+	dlistnode = thiz;
+	//找到index节点位置,或者找到链表尾部
+	while((0 < index)&&(NULL != dlistnode->pNext) )
+	{
+		dlistnode = dlistnode->pNext;
+		index--;
+	}
+	
+	if((NULL == dlistnode->pNext) && (0 <  index))
+	{
+		//说明index已经跑到链表最大长度外面了
+		printf("error:index beyond the MAX size of the list.\n");
+		return RET_OOM;
+	}
+	else if((NULL != dlistnode->pNext) && (0 == index))
+	{
+		//中间节点
+		dlistnode->pPrev->pNext = dlistnode->pNext;
+		dlistnode->pNext->pPrev = dlistnode->pPrev;
+		dlistnode->data = NULL;
+		dlistnode->pPrev = NULL;
+		dlistnode->pNext = NULL;
+		free(dlistnode);
+		dlistnode = NULL;
+		return RET_OK
+	}
+	else 
+	{
+		//尾部节点(只有头节点没有其他节点，也放在尾部节点里面)
+		thiz->current
+		return RET_OK
+	}
+	return RET_FAULT
+}
+
+
 /*
 //函数体之间使用空格
 //双向链表尾部插入
