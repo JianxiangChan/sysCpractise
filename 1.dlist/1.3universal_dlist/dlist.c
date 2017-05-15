@@ -233,9 +233,6 @@ Ret dlist_delete(DList *thiz, int index)
 	return RET_FAULT;
 }
 
-
-
-
 /**********************************
 *Function Name:	dlist_print
 *Purpose:		显示链表内容
@@ -257,82 +254,35 @@ Ret dlist_print(DList *thiz, DListDataPrintFunc print)
 	return RET_OK;
 }
 
+/**********************************
+*Function Name:	print_int
+*Purpose:		打印int类型数据
+*Params:				
+*				@void *  data	 需要打印的数据
+*Return:		Ret
+*Limitation		返回RET_OK RET_FAULT RET_OOM
+**********************************/
 Ret print_int(void * data)
 {
 	printf("%d\n", (int)data);
 	return RET_OK;
 }
 
-/* static Node * note_list_all(Node *thiz)
+Ret dlist_foreach(DList thiz, DListVisitFunc visit, void ctx)
 {
-	
-	Node *p = thiz;
-	if(NULL == p)
+	DListNode *iter = thiz ->head;
+	while(NULL != iter)
 	{
-		return NULL;
+		visit(ctx, iter->data);
+		iter = iter->pNext;
 	}
-	printf("--------------begin-------------\n");
-	while(NULL != p->pNext)
-	{
-		p = p->pNext;
-		printf("_Node data: %d.\n", p->data);
-	}
-	printf("--------------end-------------\n");
-	return p;
+	return RET_OK;
 }
 
-//逆向遍历
-static void note_list_all_reverse(Node *pTail)
+static Ret sum_cb(void* ctx, void *data)
 {
-	Node *p = pTail;
-	printf("--------------begin-------------\n");
-	while( NULL != p->pPrev)
-	{
-		printf("_Node data: %d.\n", p->data);
-		p = p->pPrev;
-	}
-	printf("--------------end-------------\n");
+	long long * result = 
 }
-
-char note_list(Node *thiz, int index)
-{
-	Node *p = thiz;
-	if(-1 > index)
-	{
-		printf("error: illegal input");
-		return -1;
-	}
-	switch (index){
-	case -1:
-		while(NULL != p->pNext)
-		{
-			p = p->pNext;
-			//printf("_Node data: %d.\n", p->data);
-		}
-		note_list_all_reverse(p);
-		break;
-	case 0:
-		note_list_all(p);
-		break;
-	default:
-		while((index--) && (0 != (p->pNext)))
-		{
-			p = p->pNext;
-		}
-		if(0 != (index+1))
-		{
-			printf("error: index is beyond the MAX size of the list\n");
-			return -1;
-		}
-		else
-		{
-			printf("node data of the index is %d.\n",p->data);
-		}
-	
-	}
-	return 0;
-	
-} */
 
 
 

@@ -12,7 +12,7 @@ typedef enum _Ret
 
 typedef struct _DList DList;
 typedef Ret (*DListDataPrintFunc)(void* data);
-
+typedef Ret (*DListVisitFunc)(void* ctx, void* data);
 
 
 //提供创建和销毁函数
