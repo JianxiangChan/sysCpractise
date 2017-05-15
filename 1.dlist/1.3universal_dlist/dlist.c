@@ -17,15 +17,13 @@
 #include <stdlib.h>
 #include "dlist.h"
 
-#define return_val_if_fail(p, val) /
-    if(!(p)) {printf("%s:%d"#p" failed./n", __func__, __LINE__); return val;}
-	
+
 //建立通用链表的存储结构
 typedef struct _DListNode
 {									
 		void * data;
-		Node *pPrev;
-		Node *pNext;
+		struct _DListNode *pPrev;
+		struct _DListNode *pNext;
 }DListNode;
 
 typedef struct _DList
@@ -33,14 +31,6 @@ typedef struct _DList
 	DListNode *head;
 	DListNode *current;
 }DList;
-
-//定义一个enum来存放函数的返回值，可以不定义
-typedef enum _Ret
-{
-	RET_OK = 1,
-	RET_FAULT,
-	RET_OOM,
-}Ret;
 
 /**********************************
 *Function Name:	dlist_create
@@ -52,7 +42,7 @@ typedef enum _Ret
 DList *dlist_create ()
 {
 	DList *dlist = (DList *)calloc(1, sizeof(DList));
-	if(NULL == DList)
+	if(NULL == dlist)
 	{
 		return NULL;
 	}
@@ -77,7 +67,7 @@ DList *dlist_create ()
 *Return:				DList返回初始化的地址
 *Limitation			返回1：说明地址不为空，返回0说明为空。
 **********************************/
-int data_dlist_check(DList *thiz, void  *data)
+static int data_dlist_check(DList *thiz, void  *data)
 {
 	if((NULL == data) || (NULL == thiz))
 	{
@@ -102,7 +92,7 @@ Ret dlist_add(DList *thiz, int index, void *data)
 	DListNode *dlistnode = NULL;
 	
 	//数据检查
-	return_val_if_fail((NULL != thiz) && (NULL != data), RET_FAULT); 
+	//return_val_if_fail((NULL != thiz) && (NULL != data), RET_FAULT); 
 	if(! (data_dlist_check(thiz, data)))
 	{
 		return RET_FAULT;
@@ -136,7 +126,7 @@ Ret dlist_add(DList *thiz, int index, void *data)
 		node->pPrev = dlistnode;
 		dlistnode->pNext->pPrev = node;
 		dlistnode->pNext = node;
-		return RET_OK
+		return RET_OK;
 	}
 	else 
 	{
@@ -144,9 +134,9 @@ Ret dlist_add(DList *thiz, int index, void *data)
 		thiz->current->pNext = node;
 		node->pPrev = thiz->current;
 		thiz->current = node;
-		return RET_OK
+		return RET_OK;
 	}
-	return RET_FAULT
+	return RET_FAULT;
 } 
 
 /**********************************
@@ -166,8 +156,8 @@ Ret dlist_delete(DList *thiz, int index)
 	DListNode *dlistnode = NULL;
 	
 	//数据检查
-	return_val_if_fail(NULL != thiz, RET_FAULT); 
-	if(! (data_dlist_check(thiz, 1)))
+	//return_val_if_fail(NULL != thiz, RET_FAULT); 
+	if(NULL == thiz)
 	{
 		return RET_FAULT;
 	}
@@ -215,21 +205,24 @@ Ret dlist_delete(DList *thiz, int index)
 		dlistnode->pNext = NULL;
 		free(dlistnode);
 		dlistnode = NULL;
-		return RET_OK
+		return RET_OK;
 	}
 	else 
 	{
-		//尾部节点(只有头节点没有其他节点，也放在尾部节点里面)
+		//尾部节点(只有头节点没有其他节点，也放在尾部节点里面)\
+		//这里dlistnode没有走到尾部，不能使用
 		if(NULL != thiz->current->pPrev)
 		{
 			//说明不是头结点
-			thiz->current = dlistnode->pPrev;
+			dlistnode = thiz->current;
+			thiz->current = thiz->current->pPrev;
 			thiz->current->pNext = NULL;
 			dlistnode->pPrev = NULL;
 			dlistnode->pNext = NULL;
 			free(dlistnode);
 			dlistnode = NULL;
 			return RET_OK;
+
 		}
 		else
 		{
@@ -237,28 +230,38 @@ Ret dlist_delete(DList *thiz, int index)
 			return RET_FAULT;
 		}
 	}
-	return RET_FAULT
+	return RET_FAULT;
 }
 
 
 
 
 /**********************************
-*Function Name:	dlist_display
+*Function Name:	dlist_print
 *Purpose:		显示链表内容
 *Params:				
 *				@DList *  thiz	 显示链表的对象
-				@int	  index  <0 链表的位置 
-								 <0 链表尾部 
-								 =0 删除整个链表
-				@void *   data   添加的数据地址
+				@DListDataPrintFunc		print	调用print函数 
 *Return:		Ret
 *Limitation		返回RET_OK RET_FAULT RET_OOM
 **********************************/
+Ret dlist_print(DList *thiz, DListDataPrintFunc print)
+{
+	DListNode* iter = thiz->head;
+	while(NULL != iter)
+	{
+		//头结点的数据也打印出来了
+		print(iter->data);
+		iter = iter->pNext;
+	}
+	return RET_OK;
+}
 
-
-
-
+Ret print_int(void * data)
+{
+	printf("%d\n", (int)data);
+	return RET_OK;
+}
 
 /* static Node * note_list_all(Node *thiz)
 {
