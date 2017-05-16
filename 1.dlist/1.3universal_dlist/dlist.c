@@ -13,7 +13,6 @@
 *
 **********************************/
 
-#include <stdio.h>
 #include <stdlib.h>
 #include "dlist.h"
 
@@ -242,7 +241,7 @@ Ret dlist_delete(DList *thiz, int index)
 *Return:		Ret
 *Limitation		返回RET_OK RET_FAULT RET_OOM
 **********************************/
-Ret dlist_print(DList *thiz, DListDataPrintFunc print)
+/* Ret dlist_print(DList *thiz, DListDataPrintFunc print)
 {
 	DListNode* iter = thiz->head;
 	while(NULL != iter)
@@ -252,7 +251,7 @@ Ret dlist_print(DList *thiz, DListDataPrintFunc print)
 		iter = iter->pNext;
 	}
 	return RET_OK;
-}
+} */
 
 /**********************************
 *Function Name:	print_int
@@ -262,15 +261,25 @@ Ret dlist_print(DList *thiz, DListDataPrintFunc print)
 *Return:		Ret
 *Limitation		返回RET_OK RET_FAULT RET_OOM
 **********************************/
-Ret print_int(void * data)
+/* Ret print_int(void * data)
 {
 	printf("%d\n", (int)data);
 	return RET_OK;
-}
+} */
 
-Ret dlist_foreach(DList thiz, DListVisitFunc visit, void ctx)
+/**********************************
+*Function Name:	dlist_foreach
+*Purpose:		对链表进行遍历，并进行各种操作
+*Params:				
+*					@DList*  thiz	 		  进行遍历的对象
+					@DListVisitFunc visit 对应的操作函数
+					@voide* ctx      		  操作函数的上下文
+*Return:		Ret
+*Limitation		返回RET_OK RET_FAULT RET_OOM
+**********************************/
+Ret dlist_foreach(DList *thiz, DListVisitFunc visit, void* ctx)
 {
-	DListNode *iter = thiz ->head;
+	DListNode* iter = thiz->head;
 	while(NULL != iter)
 	{
 		visit(ctx, iter->data);
@@ -279,10 +288,70 @@ Ret dlist_foreach(DList thiz, DListVisitFunc visit, void ctx)
 	return RET_OK;
 }
 
-static Ret sum_cb(void* ctx, void *data)
+/**********************************
+*Function Name:	sum_cb
+							print_int
+							max_cb
+							str_toupper
+*Purpose:		求和函数
+*Params:				
+*					@void*  ctx	 		  操作对象
+					@void*  data      	  操作函数的数据
+*Return:		Ret
+*Limitation		返回RET_OK RET_FAULT RET_OOM
+**********************************/
+
+//链表求和
+Ret sum_cb(void* ctx, void *data)
 {
-	long long * result = 
+	long long * result = ctx;
+	*result += (int)data;
+	return RET_OK;
 }
 
+//整形打印链表
+Ret int_print(void* ctx, void *data)
+{
+	printf("%d\n", (int)data);
+	return RET_OK;
+}
 
+//求链表最大值
+Ret max_cb(void* ctx, void* data)
+{
+	int * result = ctx;
+	if((int)data > *result)
+	{
+		*result = (int)data;
+	}
+}
+ 
+ //字符串大小写转换
+Ret str_toupper(void* ctx, void* data)
+{
+	//头结点的data为0 这样调用有误
+	if(NULL == data)
+	{
+		return RET_OK;
+	}
+	while('\0' != *(char*)data)
+	{
+		*(char *)data = toupper(*(char *)data);
+		(char*)data ++;
+	}
+}
 
+//打印链表字符串
+Ret str_print(void* ctx, void* data)
+{
+	if(NULL == data)
+	{
+		return RET_OK;
+	}
+	while('\0' != *(char*)data)
+	{
+		printf("%c",*(char*)data);
+		(char*)data ++;
+	}
+	printf("\n");
+}
