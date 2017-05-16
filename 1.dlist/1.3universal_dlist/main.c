@@ -21,13 +21,13 @@ int main (void)
 	printf("sum = %d\n",max); */
 	
 	DList *p_str = dlist_create();
+	//注意 这里的strdup函数 是调用了malloc的，所以正常的使用时候需要用free()
 	dlist_add(p_str, -1, strdup("It"));
 	dlist_add(p_str, -1, strdup("is"));
 	dlist_add(p_str, -1, strdup("OK"));
 	dlist_add(p_str, -1, strdup("!"));
 	
 	dlist_foreach(p_str, str_toupper, NULL);
-
 	dlist_foreach(p_str, str_print, NULL);
 
 	return 0;

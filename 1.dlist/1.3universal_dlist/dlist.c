@@ -14,6 +14,9 @@
 **********************************/
 
 #include <stdlib.h>
+//在包含assert.h之前定义，可以使assert无效
+#define NDEBUG
+#include <assert.h>
 #include "dlist.h"
 
 
@@ -21,6 +24,7 @@
 typedef struct _DListNode
 {									
 		void * data;
+		
 		struct _DListNode *pPrev;
 		struct _DListNode *pNext;
 }DListNode;
@@ -41,11 +45,11 @@ typedef struct _DList
 DList *dlist_create ()
 {
 	DList *dlist = (DList *)calloc(1, sizeof(DList));
+	assert(NULL == dlist);
 	if(NULL == dlist)
 	{
 		return NULL;
 	}
-	
 	dlist->head  = (DListNode *)calloc(1,sizeof(DListNode));
 	if(NULL == dlist->head)
 	{
@@ -233,41 +237,6 @@ Ret dlist_delete(DList *thiz, int index)
 }
 
 /**********************************
-*Function Name:	dlist_print
-*Purpose:		显示链表内容
-*Params:				
-*				@DList *  thiz	 显示链表的对象
-				@DListDataPrintFunc		print	调用print函数 
-*Return:		Ret
-*Limitation		返回RET_OK RET_FAULT RET_OOM
-**********************************/
-/* Ret dlist_print(DList *thiz, DListDataPrintFunc print)
-{
-	DListNode* iter = thiz->head;
-	while(NULL != iter)
-	{
-		//头结点的数据也打印出来了
-		print(iter->data);
-		iter = iter->pNext;
-	}
-	return RET_OK;
-} */
-
-/**********************************
-*Function Name:	print_int
-*Purpose:		打印int类型数据
-*Params:				
-*				@void *  data	 需要打印的数据
-*Return:		Ret
-*Limitation		返回RET_OK RET_FAULT RET_OOM
-**********************************/
-/* Ret print_int(void * data)
-{
-	printf("%d\n", (int)data);
-	return RET_OK;
-} */
-
-/**********************************
 *Function Name:	dlist_foreach
 *Purpose:		对链表进行遍历，并进行各种操作
 *Params:				
@@ -329,7 +298,7 @@ Ret max_cb(void* ctx, void* data)
  //字符串大小写转换
 Ret str_toupper(void* ctx, void* data)
 {
-	//头结点的data为0 这样调用有误
+	//头结点的data为0 所以第一次进来先判断 让其第一次不执行
 	if(NULL == data)
 	{
 		return RET_OK;
