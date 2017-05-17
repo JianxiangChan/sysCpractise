@@ -1,7 +1,7 @@
 /*
- * File:    darray.h
+ * File:    typedef.h
  * Author:  Li XianJing <xianjimli@hotmail.com>
- * Brief:   dynamic array implementation.
+ * Brief:   common types definition.
  *
  * Copyright (c) Li XianJing
  *
@@ -22,27 +22,39 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
  
- /*
- * History:
- * ================================================================
- * 2009-01-02 Li XianJing <xianjimli@hotmail.com> created
- * ================================================================
- *	2017-05-17 Jianxiang Chan<15651898806@163.com>modified
- */
  #include <stdio.h>
- #include "typedef.h"
+ #include <assert.h>
+ #include <stdlib.h>
  
- #ifndef DARRAY_H
- #define DARRAY_H
+ #ifndef TYPEDEF_H
+ #define TYPEDEF_H
  
- DECLS_BEGIN
+ typedef enum _Ret
+ {
+	 RET_OK,
+	 RET_OOM,
+	 RET_STOP,
+	 RET_INVALID_PARAMS,
+	 RET_FAIL
+ }Ret;
  
- struct _DArray;
- typedef struct _DArray DArray;
+ typedef void (*DataDestroyFunc)(void* ctx,void* data);
+ typedef Ret	(*DataVisitFunc)(void *ctx, void *data);
+ typedef int	(*DataCompareFunc)(void* ctx, void* data);
  
-DArray* darray_creat(DataDestroyFunc data_destroy, void *ctx);
-void single_thread_test(void);
-
-DECLS_END
-
+ #ifdef __cplusplus
+ #define DECLS_BEGIN extern "C" {
+ #define DECLS_END		}
+ #else
+ #define DECLS_BEGIN
+ #define DECLS_END
+ #endif/*__cplusplus*/
+ 
+ #define return_if_fail(p) if(!(p)) \
+	{printf("%s:%d Warning: "#p" failed.\n", \
+	__func__, __LINE__); return;}
+#define return_val_if_fail(p,ret) if(!(p)) \
+{printf("%s:%d Warning: "#p" failed.\n", \
+	__func__,__LINE__); return(ret);}
+ 
 #endif
