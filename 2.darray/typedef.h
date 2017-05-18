@@ -57,4 +57,5 @@
 {printf("%s:%d Warning: "#p" failed.\n", \
 	__func__,__LINE__); return(ret);}
  
+ #define SAFE_FREE(p) if(p != NULL) {free(p); p = NULL;}
 #endif

@@ -72,7 +72,6 @@
  static Ret darray_expand(DArray* thiz, size_t need)
  {
 	 return_val_if_fail(NULL != thiz, RET_INVALID_PARAMS);
-	 
 	 if((thiz->size + need) > thiz->alloc_size)		//需要增加数组
 	 {
 		 //1.5*thiz->alloc_size+10
@@ -85,8 +84,8 @@
 			 thiz->data = data;
 			 thiz->alloc_size = alloc_size;
 		 }
-		 return ((thiz->size +need) <= thiz->alloc_size) ? RET_OK : RET_FAIL;
 	 }
+	  return ((thiz->size +need) <= thiz->alloc_size) ? RET_OK : RET_FAIL;
  }
  
  static Ret darray_shrink(DArray* thiz)
@@ -114,7 +113,6 @@
 	 
 	 //防止越界
 	 cursor = cursor < thiz->size ? cursor : thiz->size;
-	 
 	 if(RET_OK == darray_expand(thiz,1))
 	 {
 		 size_t i = 0;
@@ -137,6 +135,10 @@
 	 return darray_insert(thiz, 0, data);
  }
  
+ Ret darray_append(DArray* thiz, void* data)
+ {
+	 return darray_insert(thiz, -1, data);
+ }
  Ret darray_delete(DArray* thiz, size_t index)
  {
 	 size_t i = 0;
@@ -169,9 +171,10 @@
  
  Ret darray_set_by_index(DArray* thiz, size_t index, void* data)
  {
-	 return_val_if_fail(NULL != thiz && NULL != data && index < thiz->size, 
-		RET_INVALID_PARAMS);
-		
+	  return_val_if_fail(NULL != thiz && index < thiz->size, 
+		 RET_INVALID_PARAMS);
+
+
 	thiz->data[index] = data;
 	
 	return RET_OK;
@@ -180,6 +183,8 @@
  size_t darray_length(DArray* thiz)
  {
 	 size_t length = 0;
+	 
+	 return_val_if_fail(thiz != NULL, 0);
 	 return thiz->size;
  }
  
@@ -193,6 +198,7 @@
 	 {
 		 ret = visit(ctx,thiz->data[i]);
 	 }
+	 return ret;
  }
  
  int darray_find(DArray* thiz, DataCompareFunc cmp, void* ctx)
@@ -201,23 +207,139 @@
 	 
 	 return_val_if_fail(NULL != thiz && NULL != cmp, -1);
 	 
-	 for
+	 for(i = 0; i< thiz->size; i++)
+	 {
+		 if(0 == cmp(ctx, thiz->data[i]))
+		 {
+			 break;
+		 }
+	 }
+	 return i ;
+ }
+ 
+ void darray_destory(DArray* thiz)
+ {
+	 size_t i = 0;
+	 if(NULL != thiz)
+	 {
+			 for(i = 0; i < thiz->size; i++)
+			 {
+				darray_destory_data(thiz, thiz->data[i]) ;
+			 }
+			 
+			SAFE_FREE(thiz->data);
+			SAFE_FREE(thiz);
+	 }
+		
+	return;
+ }
+ 
+ #ifdef DARRAY_TEST
+ 
+ #include <assert.h>
+ 
+ static int int_cmp(void* ctx, void* data)
+ {
+	 return (int)data - (int)ctx;
+ }
+ 
+ static Ret int_print(void* ctx, void* data)
+ {
+	printf("%d\n", (int)data);
+	return RET_OK;
+ }
+ 
+ static Ret check_and_dec_int(void* ctx, void* data)
+ {
+	 int* expected = (int *)ctx;
+	 assert(*expected == (int)data);
+	 
+	 (*expected)--;
+	 
+	 return RET_OK;
  }
  
  static void test_int_darray(void)
  {
-	 
+	int i = 0;
+	int n = 100;
+	int data = 0;
+	DArray* darray = darray_creat(NULL,NULL);
+	
+	for(i = 0; i<n; i++)
+	{
+		printf("i = %d.\n", i);
+		assert(darray_append(darray, (void*)i) == RET_OK);
+		assert(darray_length(darray) == (i+1));
+		assert(darray_get_by_index(darray, i, (void**)&data) == RET_OK);
+		assert(data == i);
+		assert(darray_set_by_index(darray, i, (void*)(2*i)) == RET_OK);
+		assert(darray_get_by_index(darray, i, (void**)&data) == RET_OK);
+		assert(data == 2*i);
+		assert(darray_set_by_index(darray, i, (void*)i) == RET_OK);
+		assert(darray_find(darray, int_cmp, (void*)i) == i);
+	}
+	
+	for(i=0; i<n; i++)
+	{
+		assert(darray_get_by_index(darray, 0, (void**)&data) == RET_OK);
+		assert(data == (i));
+		assert(darray_length(darray) == (n-i));
+		assert(darray_delete(darray, 0) == RET_OK);
+		assert(darray_length(darray) == (n-i-1));
+		if((i+1) < n)
+		{
+			assert(darray_get_by_index(darray, 0, (void**)&data) == RET_OK);
+			assert((int)data == (i+1));
+		}
+	}
+	
+	assert(darray_length(darray) == 0);
+	
+	for(i = 0; i<n; i++)
+	{
+		assert(darray_prepend(darray,(void*)i) == RET_OK);
+		assert(darray_length(darray) == i+1);
+		assert(darray_get_by_index(darray, 0, (void**)&data) == RET_OK);
+		assert(data == i);
+		assert(darray_set_by_index(darray, 0, (void*)(2*i)) == RET_OK);
+		assert(darray_get_by_index(darray, 0, (void*)&data) == RET_OK);
+		assert(data == 2*i);
+		assert(darray_set_by_index(darray, 0, (void*)i) == RET_OK);
+	}
+	
+	i = n - 1;
+	assert(darray_foreach(darray, check_and_dec_int, &i) == RET_OK);
+	
+	darray_destory(darray);
+	
+	return;
  } 
  
  static void test_invalid_params(void)
  {
+	 printf("===========Warning is normal begin==============\n");
+	assert(darray_length(NULL) == 0);
+	assert(darray_prepend(NULL, 0) == RET_INVALID_PARAMS);
+	assert(darray_append(NULL, 0) == RET_INVALID_PARAMS);
+	assert(darray_delete(NULL, 0) == RET_INVALID_PARAMS);
+	assert(darray_insert(NULL, 0, 0) == RET_INVALID_PARAMS);
+	assert(darray_set_by_index(NULL, 0, 0) == RET_INVALID_PARAMS);
+	assert(darray_get_by_index(NULL, 0, NULL) == RET_INVALID_PARAMS);
+	assert(darray_find(NULL, NULL, NULL) < 0);
+	assert(darray_foreach(NULL, NULL, NULL) == RET_INVALID_PARAMS);
+	printf("===========Warning is normal end==============\n");
+
+	return;
 	 
  }
  
- void single_thread_test(void)
+  void single_thread_test(void)
  {
 	 test_int_darray();
 	 test_invalid_params();
 	 
 	 return;
  }
+ 
+ #endif
