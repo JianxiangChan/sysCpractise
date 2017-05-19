@@ -268,6 +268,38 @@
 	}
 	return RET_OK;
  }
+ 
+ void quick_sort_impl(DArray* thiz, size_t left, size_t right, DataCompareFunc cmp)
+ {
+	 size_t save_left = left;
+	 size_t save_right right;
+	 void* x = thiz->data[left];
+	 while(left < right)
+	 {
+		 while(cmp(thiz->data[right], x) >= 0 && left < right) right--;
+		 if(left != right)
+		 {
+			thiz->data[left] = thiz->data[right];
+			left++;
+		 }
+		 while(cmp(thiz->data(left), x) <= 0 && left < right) left++;
+		 if(left != right)
+		 {
+			 thiz->data[right] = thiz->data[left];
+			 right--;
+		 }
+	 }
+	 thiz->data[left] = x;
+	 if(save_left < left)
+	 {
+		quick_sort_impl(thiz, save_left, left - 1, cmp);
+	 }
+	 if(save_right > right)
+	 {
+		 quick_sort_impl(thiz, left+1, save_right, cmp);
+	 }
+	 return; 
+ }
  #ifdef DARRAY_TEST
  
  #include <assert.h>
