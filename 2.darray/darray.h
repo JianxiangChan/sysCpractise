@@ -41,6 +41,20 @@
  typedef struct _DArray DArray;
  
 DArray* darray_creat(DataDestroyFunc data_destroy, void *ctx);
+
+Ret darray_insert(DArray* thiz, size_t index, void* data);
+Ret darray_prepend(DArray* thiz, void* data);
+Ret darray_append(DArray* thiz, void* data);
+Ret darray_delete(DArray* thiz, size_t index);
+Ret darray_get_by_index(DArray* thiz,size_t index, void** data);
+Ret darray_set_by_index(DArray* thiz, size_t index, void* data);
+size_t darray_length(DArray* thiz);
+Ret darray_foreach(DArray* thiz, DataVisitFunc visit, void* ctx);
+int darray_find(DArray* thiz, DataCompareFunc cmp, void* ctx);
+void darray_destory(DArray* thiz);
+
+Ret bubble_sort(DArray* thiz, size_t nr, DataCompareFunc cmp);
+	
 void single_thread_test(void);
 
 DECLS_END

@@ -139,6 +139,7 @@
  {
 	 return darray_insert(thiz, -1, data);
  }
+ 
  Ret darray_delete(DArray* thiz, size_t index)
  {
 	 size_t i = 0;
@@ -234,11 +235,49 @@
 	return;
  }
  
+ Ret bubble_sort(DArray* thiz, size_t nr, DataCompareFunc cmp)
+ {
+	 size_t right = 0;
+	 size_t max = 0;
+	 size_t i = 0;
+	 void* data = 0;
+	 
+	 return_val_if_fail(NULL != thiz && NULL != cmp
+			, RET_INVALID_PARAMS);
+			
+	if(nr < 2)
+	{
+		return RET_OK;
+	}
+	
+	for(right = nr -1; right >0; right --)
+	{
+		for(i = 0, max = 0; i<right; i++)
+		{
+			if(cmp(thiz->data[i],thiz->data[max]) > 0)
+			{
+				max = i;
+			}
+		}
+		if(cmp(thiz->data[max], thiz->data[right]) > 0)
+		{
+			data = thiz->data[max];
+			thiz->data[max] = thiz->data[right];
+			thiz->data[right] = data;
+		}
+	}
+	return RET_OK;
+ }
  #ifdef DARRAY_TEST
  
  #include <assert.h>
  
  static int int_cmp(void* ctx, void* data)
+ {
+	 return (int)ctx - (int)data;
+ }
+ 
+ static int_cmp_reverse(void* ctx, void* data)
  {
 	 return (int)data - (int)ctx;
  }
@@ -268,7 +307,7 @@
 	
 	for(i = 0; i<n; i++)
 	{
-		printf("i = %d.\n", i);
+		//printf("i = %d.\n", i);
 		assert(darray_append(darray, (void*)i) == RET_OK);
 		assert(darray_length(darray) == (i+1));
 		assert(darray_get_by_index(darray, i, (void**)&data) == RET_OK);
@@ -310,7 +349,8 @@
 	
 	i = n - 1;
 	assert(darray_foreach(darray, check_and_dec_int, &i) == RET_OK);
-	
+	assert(RET_OK == bubble_sort(darray, 100, int_cmp));
+	assert(RET_OK == darray_foreach(darray, int_print, NULL));
 	darray_destory(darray);
 	
 	return;
@@ -330,8 +370,7 @@
 	assert(darray_foreach(NULL, NULL, NULL) == RET_INVALID_PARAMS);
 	printf("===========Warning is normal end==============\n");
 
-	return;
-	 
+	return; 
  }
  
   void single_thread_test(void)
