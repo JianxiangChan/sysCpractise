@@ -269,36 +269,107 @@
 	return RET_OK;
  }
  
- void quick_sort_impl(DArray* thiz, size_t left, size_t right, DataCompareFunc cmp)
+ static void quick_sort_impl(void** array, size_t left, size_t right, DataCompareFunc cmp)
  {
 	 size_t save_left = left;
 	 size_t save_right right;
-	 void* x = thiz->data[left];
+	 void* x = array[left];
 	 while(left < right)
 	 {
-		 while(cmp(thiz->data[right], x) >= 0 && left < right) right--;
+		 while(cmp(array[right], x) >= 0 && left < right) right--;
 		 if(left != right)
 		 {
-			thiz->data[left] = thiz->data[right];
+			array[left] = array[right];
 			left++;
 		 }
-		 while(cmp(thiz->data(left), x) <= 0 && left < right) left++;
+		 while(cmp(array(left), x) <= 0 && left < right) left++;
 		 if(left != right)
 		 {
-			 thiz->data[right] = thiz->data[left];
+			 array[right] = array[left];
 			 right--;
 		 }
 	 }
-	 thiz->data[left] = x;
+	 array[left] = x;
 	 if(save_left < left)
 	 {
-		quick_sort_impl(thiz, save_left, left - 1, cmp);
+		quick_sort_impl(array, save_left, left - 1, cmp);
 	 }
 	 if(save_right > right)
 	 {
-		 quick_sort_impl(thiz, left+1, save_right, cmp);
+		 quick_sort_impl(array, left+1, save_right, cmp);
 	 }
 	 return; 
+ }
+ 
+ Ret quick_sort(void** array, size_t nr, DataCompareFunc cmp)
+ {
+	 Ret ret = RET_OK;
+	 
+	 return_val_if_fail(NULL != array && NULL != cmp, RET_INVALID_PARAMS);
+	 
+	 if(nr >1)
+	 {
+		 quick_sort_impl(array, 0, nr-1, cmp);
+	 }
+	 
+	 return ret;
+ }
+ 
+ static Ret merge_sort_impl(void** storage, void** array, size_t low, size_t mid,
+							size_t high, DataCompareFunc cmp)
+ {
+	 size_t i = low;
+	 size_t j = low;
+	 size_t k = mid;
+	 if((low + 1) < mid)
+	 {
+		 size_t x = low + (mid - low) >> 1;
+		 merge_sort_impl(storage, array, low, x, mid, cmp);
+	 }
+	 if((mid + 1) <¡¡high)
+	 {
+		 size_t x = mid + (high - mid) >> 1;
+		 merge_sort_impl(storage, array, mid, x, high, cmp)
+	 }
+	 while(j < mid && k <high)
+	 {
+		 if(cmp(array[j], array[k]) <= 0)
+		 {
+			 storage[i++] = array[j++];
+		 }
+		 else
+		 {
+			 storage[i++] = array[k++];
+		 }
+	 }
+	 while(j < mid)
+	 {
+		 storage[i++] = array[j++];
+	 }
+	 while(k < high)
+	 {
+		 storage[i++] = array[k++];
+	 }
+	 return RET_OK;
+ }
+ 
+ Ret merge_sort(void ** array, size_t nr, DataCompareFunc cmp)
+ {
+	 void ** storage = NULL;
+	 Ret ret = RET_OK;
+	 
+	 return_val_if_fail(NULL != array && NULL != cmp, RET_INVALID_PARAMS);
+	 
+	 if(nr > 1)
+	 {
+		 storage = (void**)malloc(sizeof(void *)*nr)£»
+		 if(NULL != storage)
+		 {
+			 ret = merge_sort_impl(storage, array, 0, nr>>1, nr, cmp);
+			 SAFE_FREE(storage);
+		 }
+	 }
+	 return ret;
  }
  #ifdef DARRAY_TEST
  
