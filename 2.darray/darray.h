@@ -54,6 +54,9 @@ int darray_find(DArray* thiz, DataCompareFunc cmp, void* ctx);
 void darray_destory(DArray* thiz);
 
 Ret bubble_sort(void** darray, size_t nr, DataCompareFunc cmp);
+Ret merge_sort(void ** array, size_t nr, DataCompareFunc cmp);
+Ret quick_sort(void** array, size_t nr, DataCompareFunc cmp);
+Ret darray_sort(DArray* thiz, SortFunc sort, DataCompareFunc cmp);
 	
 void single_thread_test(void);
 

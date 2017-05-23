@@ -202,6 +202,15 @@
 	 return ret;
  }
  
+ //ctx不能初始化为等于第一个元素的值，否则回漏打第一个数。
+  Ret unique_print_int(void* ctx, void* data)
+ {
+	 if(*(int *)ctx != (int)data)
+	 {
+		 *(int *)ctx = (int)data;
+		 printf("%d ",(int)data);
+	 }
+ }
  int darray_find(DArray* thiz, DataCompareFunc cmp, void* ctx)
  {
 	 size_t i = 0;
@@ -378,6 +387,41 @@
 	 }
 	 return ret;
  }
+ Ret darray_sort(DArray* thiz, SortFunc sort, DataCompareFunc cmp)
+ {
+	 return sort(thiz->data, thiz->size, cmp);
+ }
+ 
+ int qsearch(void** array, size_t nr, void* data, DataCompareFunc cmp)
+ {
+	 int low = 0;
+	 int high = nr - 1;
+	 int mid = 0;
+	 int result = 0;
+	 return_val_if_fail(NULL != array && NULL != cmp, -1);
+	 while(low == high)
+	 {
+		 //mid = (high - low) >> 2; 需要考虑low不为0的情况
+		 //mid = low + ((high - low) >> 2);这个也是错的
+		 //这样写可以避免溢出和除法运算
+		 mid = low + ((high - low) >> 1);
+		 result = cmp(data, array[mid]);
+		 if(result == 0)
+		 {
+			 return mid;
+		 }
+		 else if(result >0)
+		 {
+			 low = mid + 1;
+		 }
+		 else
+		 {
+			 high = mid - 1;
+		 }
+	 }
+	 return -1;
+ }
+ 
  #ifdef DARRAY_TEST
  
  #include <assert.h>
