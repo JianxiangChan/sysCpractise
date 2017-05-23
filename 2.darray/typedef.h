@@ -41,6 +41,8 @@
  typedef void (*DataDestroyFunc)(void* ctx,void* data);
  typedef Ret	(*DataVisitFunc)(void *ctx, void *data);
  typedef int	(*DataCompareFunc)(void* ctx, void* data);
+ typedef Ret (*SortFunc)(void** array, size_t nr, DataCompareFunc);
+
  
  #ifdef __cplusplus
  #define DECLS_BEGIN extern "C" {

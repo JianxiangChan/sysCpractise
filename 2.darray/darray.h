@@ -53,7 +53,7 @@ Ret darray_foreach(DArray* thiz, DataVisitFunc visit, void* ctx);
 int darray_find(DArray* thiz, DataCompareFunc cmp, void* ctx);
 void darray_destory(DArray* thiz);
 
-Ret bubble_sort(DArray* thiz, size_t nr, DataCompareFunc cmp);
+Ret bubble_sort(void** darray, size_t nr, DataCompareFunc cmp);
 	
 void single_thread_test(void);
 

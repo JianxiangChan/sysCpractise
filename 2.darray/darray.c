@@ -235,14 +235,14 @@
 	return;
  }
  
- Ret bubble_sort(DArray* thiz, size_t nr, DataCompareFunc cmp)
+ Ret bubble_sort(void** array, size_t nr, DataCompareFunc cmp)
  {
 	 size_t right = 0;
 	 size_t max = 0;
 	 size_t i = 0;
 	 void* data = 0;
 	 
-	 return_val_if_fail(NULL != thiz && NULL != cmp
+	 return_val_if_fail(NULL != array && NULL != cmp
 			, RET_INVALID_PARAMS);
 			
 	if(nr < 2)
@@ -254,16 +254,16 @@
 	{
 		for(i = 0, max = 0; i<right; i++)
 		{
-			if(cmp(thiz->data[i],thiz->data[max]) > 0)
+			if(cmp(array[i],array[max]) > 0)
 			{
 				max = i;
 			}
 		}
-		if(cmp(thiz->data[max], thiz->data[right]) > 0)
+		if(cmp(array[max], array[right]) > 0)
 		{
-			data = thiz->data[max];
-			thiz->data[max] = thiz->data[right];
-			thiz->data[right] = data;
+			data = array[max];
+			array[max] = array[right];
+			array[right] = data;
 		}
 	}
 	return RET_OK;
@@ -272,7 +272,7 @@
  static void quick_sort_impl(void** array, size_t left, size_t right, DataCompareFunc cmp)
  {
 	 size_t save_left = left;
-	 size_t save_right right;
+	 size_t save_right = right;
 	 void* x = array[left];
 	 while(left < right)
 	 {
@@ -282,7 +282,7 @@
 			array[left] = array[right];
 			left++;
 		 }
-		 while(cmp(array(left), x) <= 0 && left < right) left++;
+		 while(cmp(array[left], x) <= 0 && left < right) left++;
 		 if(left != right)
 		 {
 			 array[right] = array[left];
@@ -323,14 +323,16 @@
 	 size_t k = mid;
 	 if((low + 1) < mid)
 	 {
-		 size_t x = low + (mid - low) >> 1;
+		 size_t x = low + ((mid - low) >> 1);	//这里在写的时候忘记了大括号 导致优先级运行错误  所以程序死在这里 可怕的BUG!!!
 		 merge_sort_impl(storage, array, low, x, mid, cmp);
 	 }
-	 if((mid + 1) <　high)
+	 if((mid + 1) < high)
 	 {
-		 size_t x = mid + (high - mid) >> 1;
-		 merge_sort_impl(storage, array, mid, x, high, cmp)
+
+		 size_t x = mid + ((high - mid) >> 1);
+		 merge_sort_impl(storage, array, mid, x, high, cmp);
 	 }
+	 	
 	 while(j < mid && k <high)
 	 {
 		 if(cmp(array[j], array[k]) <= 0)
@@ -342,6 +344,7 @@
 			 storage[i++] = array[k++];
 		 }
 	 }
+
 	 while(j < mid)
 	 {
 		 storage[i++] = array[j++];
@@ -350,6 +353,10 @@
 	 {
 		 storage[i++] = array[k++];
 	 }
+	 for(i = low; i< high; i++)
+	 {
+		 array[i] = storage[i];
+	}
 	 return RET_OK;
  }
  
@@ -362,7 +369,7 @@
 	 
 	 if(nr > 1)
 	 {
-		 storage = (void**)malloc(sizeof(void *)*nr)；
+		 storage = (void**)malloc(sizeof(void *) * nr);
 		 if(NULL != storage)
 		 {
 			 ret = merge_sort_impl(storage, array, 0, nr>>1, nr, cmp);
@@ -452,8 +459,6 @@
 	
 	i = n - 1;
 	assert(darray_foreach(darray, check_and_dec_int, &i) == RET_OK);
-	assert(RET_OK == bubble_sort(darray, 100, int_cmp));
-	assert(RET_OK == darray_foreach(darray, int_print, NULL));
 	darray_destory(darray);
 	
 	return;
@@ -476,10 +481,48 @@
 	return; 
  }
  
+ static void ** creat_int_array(int n)
+ {
+	int i = 0;
+	int* array = (int*)malloc(sizeof(int) * n);
+	for(i = 0; i < n; i++)
+	{
+		array[i] = rand();
+	}
+	return (void**)array;
+ }
+ 
+ static void sort_test_one_asc(SortFunc sort, int n)
+ {
+	 int i = 0;
+	 void** array = creat_int_array(n);
+	 sort(array, n, int_cmp);
+	 for(i = 1; i < n; i++)
+	 {
+		 assert(array[i] >= array[i-1]);
+	 }
+	 
+	 SAFE_FREE(array);
+	 
+	 return;
+ }
+ 
+ void sort_test(SortFunc sort)
+ {
+	int i = 0;
+	for(i = 0; i < 1000; i++)
+	{
+		sort_test_one_asc(sort, i);
+	}
+ }
+ 
   void single_thread_test(void)
  {
 	 test_int_darray();
 	 test_invalid_params();
+	 sort_test(quick_sort);
+	 sort_test(merge_sort);
+	 sort_test(bubble_sort);
 	 
 	 return;
  }
