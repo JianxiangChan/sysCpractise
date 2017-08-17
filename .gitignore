@@ -53,3 +53,4 @@ dkms.conf
 #docfile
 doc/*
 spexamples/*
+svn/*
