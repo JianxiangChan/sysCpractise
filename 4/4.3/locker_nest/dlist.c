@@ -388,6 +388,7 @@ void dlist_destroy(DList* thiz)
 #include <assert.h>
 #include <pthread.h>
 #include "locker_pthread.h"
+#include "locker_nest.h"
 
 static int cmp_int(void* ctx, void* data)
 {
@@ -538,11 +539,19 @@ static void* consumer(void* param)
 	return NULL;
 }
 
+static unsigned long int get_tid (void)
+{
+	unsigned long int  tid = pthread_self();
+	//printf("%s,%d:tid is %lu\n",__func__, __LINE__,tid);
+	return tid;
+}
+
 static void multi_thread_test(void)
 {
 	pthread_t consumer_tid = 0;
 	pthread_t producer_tid = 0;
-	DList* dlist = dlist_create(NULL, NULL, locker_pthread_create());
+	Locker* plocker = locker_pthread_create();
+	DList* dlist = dlist_create(NULL, NULL, locker_nest_create(plocker,get_tid));
 	pthread_create(&producer_tid, NULL, producer, dlist);
 	pthread_create(&consumer_tid, NULL, consumer, dlist);
 	pthread_join(producer_tid,NULL);

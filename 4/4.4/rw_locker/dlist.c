@@ -178,7 +178,7 @@ Ret dlist_insert(DList* thiz, size_t index, void* data)
 		}
 
 		cursor = dlist_get_node(thiz, index, 1);
-		//对于默认的互斥锁，是不能嵌套加锁的！
+		//这里嵌套加锁了 对于
 		if(index < dlist_length(thiz))
 		{
 			if(thiz->first == cursor)

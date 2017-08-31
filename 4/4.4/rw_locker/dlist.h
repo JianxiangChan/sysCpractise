@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 #include "locker.h"
-
+#include "locker_nest.h"
 
 #ifndef DLIST_H
 #define DLIST_H
