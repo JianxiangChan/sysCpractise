@@ -1,5 +1,5 @@
 #include "locker_nest.h"
-
+#include <stdlib.h>
 
 
 typedef struct _PrivInfo
@@ -7,7 +7,7 @@ typedef struct _PrivInfo
 	int owner;
 	int refcount;
 	Locker* real_locker;
-	TaskSelfFunc task_self
+	TaskSelfFunc task_self;
 }PrivInfo;
 
 static Ret locker_nest_lock(Locker* thiz)
@@ -24,7 +24,7 @@ static Ret locker_nest_lock(Locker* thiz)
 		/*加锁，然后记录当前线程ID*/
 		if((ret = locker_lock(priv->real_locker)) == RET_OK)
 		{
-			priv->owner == priv->task_self();
+			priv->owner = priv->task_self();
 			priv->refcount = 1;
 		}
 	}
@@ -54,7 +54,7 @@ static void locker_nest_destroy(Locker* thiz)
 	
 	priv->owner = 0;
 	priv->refcount = 0;
-	lock_destroy(prov->real_locker);
+	locker_destroy(priv->real_locker);
 	priv->real_locker = NULL;
 	SAFE_FREE(thiz);
 	
@@ -64,7 +64,7 @@ static void locker_nest_destroy(Locker* thiz)
 Locker* locker_nest_create(Locker* real_locker, TaskSelfFunc task_self)
 {
 	Locker* thiz = NULL;
-	return_if_fail(real_locker != NULL && task_self != NULL, NULL);
+	return_val_if_fail(real_locker != NULL && task_self != NULL, NULL);
 	
 	thiz = (Locker*)malloc(sizeof(Locker) + sizeof(PrivInfo));
 	
